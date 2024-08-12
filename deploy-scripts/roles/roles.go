@@ -1,6 +1,8 @@
 package roles
 
 import (
+	"fmt"
+
 	"github.com/aws/aws-cdk-go/awscdk/v2"
 	dynamodb "github.com/aws/aws-cdk-go/awscdk/v2/awsdynamodb"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awsiam"
@@ -35,6 +37,39 @@ func CreatePBRHandlerRole(stack awscdk.Stack, log_group awslogs.LogGroup, user_t
 			jsii.String(*user_table.TableArn()),
 			jsii.String(*discount_table.TableArn()),
 			jsii.String(*log_group.LogGroupArn()),
+			jsii.String("*"),
+		},
+	}))
+	return role
+}
+
+func CreateWebSocketLambdaRole(stack awscdk.Stack, stack_name string, role_name string) awsiam.Role {
+	role_name = fmt.Sprintf("%sWebSocket-Lambda-Role-%s", stack_name, role_name)
+	role := awsiam.NewRole(stack, jsii.String(role_name), &awsiam.RoleProps{
+		AssumedBy: awsiam.NewServicePrincipal(jsii.String("lambda.amazonaws.com"), &awsiam.ServicePrincipalOpts{}),
+	})
+
+	role.AddToPolicy(awsiam.NewPolicyStatement(&awsiam.PolicyStatementProps{
+		Actions: &[]*string{
+			jsii.String("logs:CreateLogGroup"),
+			jsii.String("logs:PutLogEvents"),
+			jsii.String("logs:DescribeLogStreams"),
+			jsii.String("logs:CreateLogStream"),
+			jsii.String("dynamodb:BatchGet*"),
+			jsii.String("dynamodb:DescribeStream"),
+			jsii.String("dynamodb:DescribeTable"),
+			jsii.String("dynamodb:Get*"),
+			jsii.String("dynamodb:Query"),
+			jsii.String("dynamodb:Scan"),
+			jsii.String("dynamodb:BatchWrite*"),
+			jsii.String("dynamodb:CreateTable"),
+			jsii.String("dynamodb:Delete*"),
+			jsii.String("dynamodb:Update*"),
+			jsii.String("dynamodb:PutItem"),
+			jsii.String("execute-api:Invoke"),
+			jsii.String("execute-api:ManageConnections"),
+		},
+		Resources: &[]*string{
 			jsii.String("*"),
 		},
 	}))

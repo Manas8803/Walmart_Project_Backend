@@ -75,6 +75,52 @@ func NewWalmartProjectBackendStack(scope constructs.Construct, id string, props 
 			AllowHeaders: awsapigateway.Cors_DEFAULT_HEADERS(),
 		},
 	})
+
+	//~ WEBSOCKET API :
+	//^ Connect Route
+	awslambda.NewFunction(stack, jsii.String("Connect-Lambda"), &awslambda.FunctionProps{
+		Code:    awslambda.Code_FromAsset(jsii.String("../websocket/connect"), nil),
+		Runtime: awslambda.Runtime_NODEJS_16_X(),
+		Handler: jsii.String("index.handler"),
+		Timeout: awscdk.Duration_Seconds(jsii.Number(10)),
+		Environment: &map[string]*string{
+			"REGION":             jsii.String(os.Getenv("CDK_DEFAULT_REGION")),
+			"DISCOUNT_TABLE_ARN": jsii.String(*discount_table.TableArn()),
+			"USER_TABLE_ARN":     jsii.String(*user_table.TableArn()),
+		},
+		FunctionName: jsii.String(fmt.Sprintf("%s-Connect-Lambda", stack_name)),
+		Role:         roles.CreateWebSocketLambdaRole(stack, "Connect", stack_name),
+	})
+
+	// //^ Disconnect Route
+	// awslambda.NewFunction(stack, jsii.String("Disconnect-Lambda"), &awslambda.FunctionProps{
+	// 	Code:    awslambda.Code_FromAsset(jsii.String("../websocket/disconnect"), nil),
+	// 	Runtime: awslambda.Runtime_NODEJS_16_X(),
+	// 	Handler: jsii.String("index.handler"),
+	// 	Timeout: awscdk.Duration_Seconds(jsii.Number(10)),
+	// 	Environment: &map[string]*string{
+	// 		"REGION":             jsii.String(os.Getenv("CDK_DEFAULT_REGION")),
+	// 		"DISCOUNT_TABLE_ARN": jsii.String(*discount_table.TableArn()),
+	// 		"USER_TABLE_ARN":     jsii.String(*user_table.TableArn()),
+	// 	},
+	// 	FunctionName: jsii.String(fmt.Sprintf("%s-Disconnect-Lambda", stack_name)),
+	// 	Role:         roles.CreateWebSocketLambdaRole(stack, "Disconnect", stack_name),
+	// })
+
+	// //^ Report Authority Route
+	// awslambda.NewFunction(stack, jsii.String("Notify-Lambda"), &awslambda.FunctionProps{
+	// 	Code:    awslambda.Code_FromAsset(jsii.String("../websocket/notify"), nil),
+	// 	Runtime: awslambda.Runtime_NODEJS_16_X(),
+	// 	Handler: jsii.String("index.handler"),
+	// 	Timeout: awscdk.Duration_Seconds(jsii.Number(10)),
+	// 	Environment: &map[string]*string{
+	// 		"REGION":             jsii.String(os.Getenv("CDK_DEFAULT_REGION")),
+	// 		"DISCOUNT_TABLE_ARN": jsii.String(*discount_table.TableArn()),
+	// 		"USER_TABLE_ARN":     jsii.String(*user_table.TableArn()),
+	// 	},
+	// 	FunctionName: jsii.String(fmt.Sprintf("%s-Notify-Lambda", stack_name)),
+	// 	Role:         roles.CreateWebSocketLambdaRole(stack, "Notify", stack_name),
+	// })
 	return stack
 }
 
