@@ -1,6 +1,8 @@
 package db
 
 import (
+	"errors"
+	"log"
 	"os"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -36,7 +38,8 @@ func FetchDiscountByBeaconID(beaconID string) (*DiscountDB, error) {
 	}
 
 	if result.Item == nil {
-		return nil, nil
+		log.Println("No discount found for the specified beacon_id")
+		return nil, errors.New("no discount found for the specified beacon_id")
 	}
 
 	discount := &DiscountDB{}

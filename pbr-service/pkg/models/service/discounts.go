@@ -1,8 +1,6 @@
 package service
 
 import (
-	"fmt"
-
 	"github.com/Manas8803/Walmart_Project_Backend/pbr-service/pkg/models/db"
 )
 
@@ -14,7 +12,7 @@ type Discount struct {
 func FetchDiscountByBeaconID(beaconID string) (*Discount, error) {
 	dbDiscount, err := db.FetchDiscountByBeaconID(beaconID)
 	if err != nil {
-		return nil, fmt.Errorf("failed to fetch discount from database: %w", err)
+		return nil, err
 	}
 
 	if dbDiscount == nil {

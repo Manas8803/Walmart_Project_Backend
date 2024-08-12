@@ -61,7 +61,7 @@ func NewWalmartProjectBackendStack(scope constructs.Construct, id string, props 
 			"REGION":               jsii.String(os.Getenv("CDK_DEFAULT_REGION")),
 			"DISCOUNT_TABLE_ARN":   jsii.String(*discount_table.TableArn()),
 			"USER_TABLE_ARN":       jsii.String(*user_table.TableArn()),
-			"REPORT_WEBSOCKET_URL": jsii.String(os.Getenv("REPORT_WEBSOCKET_URL")),
+			"NOTIFY_WEBSOCKET_URL": jsii.String(os.Getenv("NOTIFY_WEBSOCKET_URL")),
 		},
 		FunctionName: jsii.String(fmt.Sprintf("%s-PBR_Service-Lambda", stack_name)),
 		LogGroup:     logGroup_pbr,
@@ -78,6 +78,10 @@ func NewWalmartProjectBackendStack(scope constructs.Construct, id string, props 
 
 	//~ WEBSOCKET API :
 	//^ Connect Route
+	// logGroup_connect := awslogs.NewLogGroup(stack, jsii.String("Connect-LogGroup"), &awslogs.LogGroupProps{
+	// 	LogGroupName:  jsii.String(fmt.Sprintf("/aws/lambda/%s-Connect", stack_name)),
+	// 	RemovalPolicy: awscdk.RemovalPolicy_DESTROY,
+	// })
 	awslambda.NewFunction(stack, jsii.String("Connect-Lambda"), &awslambda.FunctionProps{
 		Code:    awslambda.Code_FromAsset(jsii.String("../websocket/connect"), nil),
 		Runtime: awslambda.Runtime_NODEJS_16_X(),
@@ -90,37 +94,49 @@ func NewWalmartProjectBackendStack(scope constructs.Construct, id string, props 
 		},
 		FunctionName: jsii.String(fmt.Sprintf("%s-Connect-Lambda", stack_name)),
 		Role:         roles.CreateWebSocketLambdaRole(stack, "Connect", stack_name),
+		// LogGroup:     logGroup_connect,
 	})
 
-	// //^ Disconnect Route
-	// awslambda.NewFunction(stack, jsii.String("Disconnect-Lambda"), &awslambda.FunctionProps{
-	// 	Code:    awslambda.Code_FromAsset(jsii.String("../websocket/disconnect"), nil),
-	// 	Runtime: awslambda.Runtime_NODEJS_16_X(),
-	// 	Handler: jsii.String("index.handler"),
-	// 	Timeout: awscdk.Duration_Seconds(jsii.Number(10)),
-	// 	Environment: &map[string]*string{
-	// 		"REGION":             jsii.String(os.Getenv("CDK_DEFAULT_REGION")),
-	// 		"DISCOUNT_TABLE_ARN": jsii.String(*discount_table.TableArn()),
-	// 		"USER_TABLE_ARN":     jsii.String(*user_table.TableArn()),
-	// 	},
-	// 	FunctionName: jsii.String(fmt.Sprintf("%s-Disconnect-Lambda", stack_name)),
-	// 	Role:         roles.CreateWebSocketLambdaRole(stack, "Disconnect", stack_name),
+	//^ Disconnect Route
+	// logGroup_disconnect := awslogs.NewLogGroup(stack, jsii.String("Disconnect-LogGroup"), &awslogs.LogGroupProps{
+	// 	LogGroupName:  jsii.String(fmt.Sprintf("/aws/lambda/%s-Connect", stack_name)),
+	// 	RemovalPolicy: awscdk.RemovalPolicy_DESTROY,
 	// })
+	awslambda.NewFunction(stack, jsii.String("Disconnect-Lambda"), &awslambda.FunctionProps{
+		Code:    awslambda.Code_FromAsset(jsii.String("../websocket/disconnect"), nil),
+		Runtime: awslambda.Runtime_NODEJS_16_X(),
+		Handler: jsii.String("index.handler"),
+		Timeout: awscdk.Duration_Seconds(jsii.Number(10)),
+		Environment: &map[string]*string{
+			"REGION":             jsii.String(os.Getenv("CDK_DEFAULT_REGION")),
+			"DISCOUNT_TABLE_ARN": jsii.String(*discount_table.TableArn()),
+			"USER_TABLE_ARN":     jsii.String(*user_table.TableArn()),
+		},
+		FunctionName: jsii.String(fmt.Sprintf("%s-Disconnect-Lambda", stack_name)),
+		Role:         roles.CreateWebSocketLambdaRole(stack, "Disconnect", stack_name),
+		// LogGroup:     logGroup_disconnect,
+	})
 
-	// //^ Report Authority Route
-	// awslambda.NewFunction(stack, jsii.String("Notify-Lambda"), &awslambda.FunctionProps{
-	// 	Code:    awslambda.Code_FromAsset(jsii.String("../websocket/notify"), nil),
-	// 	Runtime: awslambda.Runtime_NODEJS_16_X(),
-	// 	Handler: jsii.String("index.handler"),
-	// 	Timeout: awscdk.Duration_Seconds(jsii.Number(10)),
-	// 	Environment: &map[string]*string{
-	// 		"REGION":             jsii.String(os.Getenv("CDK_DEFAULT_REGION")),
-	// 		"DISCOUNT_TABLE_ARN": jsii.String(*discount_table.TableArn()),
-	// 		"USER_TABLE_ARN":     jsii.String(*user_table.TableArn()),
-	// 	},
-	// 	FunctionName: jsii.String(fmt.Sprintf("%s-Notify-Lambda", stack_name)),
-	// 	Role:         roles.CreateWebSocketLambdaRole(stack, "Notify", stack_name),
-	// })
+	//^ Notify Route
+	logGroup_notify := awslogs.NewLogGroup(stack, jsii.String("Notify-LogGroup"), &awslogs.LogGroupProps{
+		LogGroupName:  jsii.String(fmt.Sprintf("/aws/lambda/%s-Notify", stack_name)),
+		RemovalPolicy: awscdk.RemovalPolicy_DESTROY,
+	})
+	awslambda.NewFunction(stack, jsii.String("Notify-Lambda"), &awslambda.FunctionProps{
+		Code:    awslambda.Code_FromAsset(jsii.String("../websocket/notify"), nil),
+		Runtime: awslambda.Runtime_NODEJS_16_X(),
+		Handler: jsii.String("index.handler"),
+		Timeout: awscdk.Duration_Seconds(jsii.Number(10)),
+		Environment: &map[string]*string{
+			"REGION":             jsii.String(os.Getenv("CDK_DEFAULT_REGION")),
+			"DISCOUNT_TABLE_ARN": jsii.String(*discount_table.TableArn()),
+			"USER_TABLE_ARN":     jsii.String(*user_table.TableArn()),
+		},
+		FunctionName: jsii.String(fmt.Sprintf("%s-Notify-Lambda", stack_name)),
+		Role:         roles.CreateWebSocketLambdaRole(stack, "Notify", stack_name),
+		LogGroup:     logGroup_notify,
+	})
+
 	return stack
 }
 

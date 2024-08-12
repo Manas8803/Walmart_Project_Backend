@@ -1,8 +1,6 @@
 package service
 
 import (
-	"fmt"
-
 	"github.com/Manas8803/Walmart_Project_Backend/pbr-service/pkg/models/db"
 )
 
@@ -15,7 +13,7 @@ type User struct {
 func FetchUserByID(userID string) (*User, error) {
 	dbUser, err := db.FetchUserByID(userID)
 	if err != nil {
-		return nil, fmt.Errorf("failed to fetch user from database: %w", err)
+		return nil, err
 	}
 
 	if dbUser == nil {

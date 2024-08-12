@@ -1,6 +1,8 @@
 package db
 
 import (
+	"errors"
+	"log"
 	"os"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -37,11 +39,13 @@ func FetchUserByID(userID string) (*User, error) {
 	}
 
 	if result.Item == nil {
-		return nil, nil // User not found
+		log.Println("No user found for the specified user_id")
+		return nil, errors.New("no user found for the specified user_id")
 	}
 
 	user := &User{}
 	err = dynamodbattribute.UnmarshalMap(result.Item, user)
+	log.Println(user)
 	if err != nil {
 		return nil, err
 	}

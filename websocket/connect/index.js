@@ -6,8 +6,8 @@ exports.handler = async function (event, context) {
 
     if (!user_id) {
         return {
-            statusCode: 400,
-            body: JSON.stringify({ message: "Please provide a user_id." }),
+            statusCode: 200,
+            body: JSON.stringify({ message: "Connected successfully" }),
         };
     }
 
@@ -28,7 +28,7 @@ exports.handler = async function (event, context) {
         }
 
         // Get the existing connection_ids or initialize an empty array
-        let connectionIds = userData.Item.connection_id || [];
+        let connectionIds = userData.Item.connection_ids || [];
 
         // Add the new connectionId to the array
         connectionIds.push(event.requestContext.connectionId);
@@ -37,7 +37,7 @@ exports.handler = async function (event, context) {
         await ddb.update({
             TableName: process.env.USER_TABLE_ARN,
             Key: { user_id: user_id },
-            UpdateExpression: "SET connection_id = :connectionIds",
+            UpdateExpression: "SET connection_ids = :connectionIds",
             ExpressionAttributeValues: {
                 ":connectionIds": connectionIds,
             },

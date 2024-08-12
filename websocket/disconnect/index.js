@@ -8,7 +8,7 @@ exports.handler = async function (event, context) {
     // Scan the user table to find the item with the given connectionId
     const scanParams = {
       TableName: process.env.USER_TABLE_ARN,
-      FilterExpression: "contains(connection_id, :connectionId)",
+      FilterExpression: "contains(connection_ids, :connectionId)",
       ExpressionAttributeValues: {
         ":connectionId": connectionId
       }
@@ -27,8 +27,8 @@ exports.handler = async function (event, context) {
 
     const userToUpdate = scanResult.Items[0];
     
-    // Remove the current connectionId from the connection_id array
-    const updatedConnectionIds = userToUpdate.connection_id.filter(
+    // Remove the current connectionId from the connection_ids array
+    const updatedConnectionIds = userToUpdate.connection_ids.filter(
       (id) => id !== connectionId
     );
 
@@ -36,7 +36,7 @@ exports.handler = async function (event, context) {
     await ddb.update({
       TableName: process.env.USER_TABLE_ARN,
       Key: { user_id: userToUpdate.user_id },
-      UpdateExpression: "SET connection_id = :updatedConnectionIds",
+      UpdateExpression: "SET connection_ids = :updatedConnectionIds",
       ExpressionAttributeValues: {
         ":updatedConnectionIds": updatedConnectionIds,
       },
