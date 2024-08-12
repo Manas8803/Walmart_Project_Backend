@@ -9,7 +9,7 @@ import (
 
 	"github.com/Manas8803/Walmart_Project_Backend/pbr-service/pkg/models/service"
 	"github.com/aws/aws-lambda-go/events"
-	lmd "github.com/aws/aws-lambda-go/lambda"cd
+	lmd "github.com/aws/aws-lambda-go/lambda"
 	"github.com/gorilla/websocket"
 )
 
